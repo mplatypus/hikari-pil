@@ -144,19 +144,3 @@ def banner_create(data: bannerData) -> None | bytes:
     image_copy.save(img_byte_array, format="PNG")
 
     return img_byte_array.getvalue()
-
-async def create_test_banner():
-    data = bannerData(banner_type=bannerType.JOIN, username="Platy", user_descriminator="0010", pfp_file_name="platypusimage", member_count=12)
-    print("with desc: " + str(banner_create(data)))
-    data = bannerData(banner_type=bannerType.JOIN, username="Platy", pfp_file_name="platypusimage", member_count=12)
-    print("without desc: " + str(banner_create(data)))
-    data = bannerData(banner_type=bannerType.JOIN, username="PlatypusesAreCool", user_descriminator="0010", pfp_file_name="platypusimage", member_count=12)
-    print("long with desc: " + str(banner_create(data)))
-    data = bannerData(banner_type=bannerType.JOIN, username="PlatypusesAreCool", pfp_file_name="platypusimage", member_count=12)
-    print("long without desc: " + str(banner_create(data)))
-
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(create_test_banner())
