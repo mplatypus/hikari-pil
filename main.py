@@ -35,12 +35,26 @@ async def test(ctx: lightbulb.Context) -> None:
     async with ctx.author.display_avatar_url.stream() as stream:
         data = await stream.read()
 
-    #print(data)
+    current = datetime.now()
+
+    time_in_sec = (current - start).total_seconds()
+
+    print("streamed data in: " + str(time_in_sec))
 
     file_name = "temp_pfp_" + str(random.randint(0, 9999)).zfill(4)
 
+    new_start = datetime.now()
+
     async with aiofiles.open("images_storage/pfp_images/" + file_name + ".png", "wb") as file:
         await file.write(data)
+
+    current = datetime.now()
+
+    time_in_sec = (current - new_start).total_seconds()
+
+    print("saved data in: " + str(time_in_sec))
+
+    new_start = datetime.now()
 
     member_count: int = 0
     if ctx.guild_id != None:
@@ -56,13 +70,15 @@ async def test(ctx: lightbulb.Context) -> None:
 
     loop = asyncio.get_running_loop()
 
-    
-
     result = await loop.run_in_executor(None, functools.partial(images.banner_create, data=banner_data))
 
     current = datetime.now()
 
+    time_in_sec = (current - new_start).total_seconds()
+
     time_in_sec = (current - start).total_seconds()
+
+    print("created and saved image in: " + str(time_in_sec))
     
     if result != None and result.strip() != "":
         await ctx.respond(
