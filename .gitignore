@@ -152,4 +152,7 @@ cython_debug/
 #.idea/
 
 
-images/fonts
+images/fonts/*
+images_storage/join_banners/*
+images_storage/leave_banners/*
+images_storage/pfp_images/*
