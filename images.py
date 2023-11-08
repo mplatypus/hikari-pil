@@ -4,6 +4,8 @@ import PIL
 
 import random, asyncio
 
+import io
+
 class bannerType:
     JOIN = 1
     LEAVE = 0
@@ -47,11 +49,11 @@ def round_corners(image: Image, radius: int) -> Image:
     return rgba_image
 
 class bannerData:
-    def __init__(self, *, banner_type: bannerType | int, username: str, user_descriminator: str | None = None, pfp_file_name: str, member_count: int) -> None:
+    def __init__(self, *, banner_type: bannerType | int, username: str, user_descriminator: str | None = None, pfp_bytes: bytes, member_count: int) -> None:
         self._banner_type: bannerType | int = banner_type
         self._username: str = username
         self._user_descriminator: str | None = user_descriminator
-        self._pfp_file_name: str = pfp_file_name
+        self._pfp_bytes: bytes = pfp_bytes
         self._member_count: int = member_count
 
     @property
@@ -64,8 +66,8 @@ class bannerData:
     def user_descriminator(self) -> str | None:
         return self._user_descriminator
     @property
-    def pfp_file_name(self) -> str:
-        return self._pfp_file_name
+    def pfp_bytes(self) -> bytes:
+        return self._pfp_bytes
     @property
     def member_count(self) -> int:
         return self._member_count
@@ -76,7 +78,7 @@ class bannerData:
 
 
 # This is only for Joins and Leaving.
-def banner_create(data: bannerData) -> None | str:
+def banner_create(data: bannerData) -> None | bytes:
     base_image: Image
     
     banner_message = ""
@@ -97,10 +99,12 @@ def banner_create(data: bannerData) -> None | str:
 
     draw.rectangle(rectangle_coordinates, outline="BLACK", fill="BLACK")
 
-    profile_image = Image.open("./images_storage/pfp_images/" + data.pfp_file_name + ".png")
+    profile_image = Image.open(io.BytesIO(data.pfp_bytes))
+
+    #profile_image = Image.open("./images_storage/pfp_images/" + data.pfp_file_name + ".png")
 
     profile_image = profile_image.resize((base_image.size[1] - (padding * 4), base_image.size[1] - (padding * 4)))
-    #profile_image = profile_image.convert("RGBA")
+    profile_image = profile_image.convert("RGBA")
 
     profile_image.putalpha(255)
 
@@ -135,9 +139,11 @@ def banner_create(data: bannerData) -> None | str:
     
     file_name = "temp_" + str(random.randint(0, 9999)).zfill(4)
 
-    image_copy.save("./images_storage/join_banners/" + file_name + ".png", format="PNG")
+    img_byte_array = io.BytesIO()
 
-    return file_name
+    image_copy.save(img_byte_array, format="PNG")
+
+    return img_byte_array.getvalue()
 
 async def create_test_banner():
     data = bannerData(banner_type=bannerType.JOIN, username="Platy", user_descriminator="0010", pfp_file_name="platypusimage", member_count=12)
