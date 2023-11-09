@@ -34,10 +34,12 @@ async def create_banner_command(ctx: lightbulb.Context, banner_type: images.bann
     member_count: int = 0
     if ctx.guild_id != None:
         member_count = len(await bot.rest.fetch_members(ctx.guild_id))
+    
+    print(ctx.author.username)
 
     banner_data = images.bannerData(
         banner_type=banner_type,
-        username=ctx.author.username,
+        username=(ctx.author.username.split("#"))[0],
         user_descriminator=ctx.author.discriminator,
         pfp_bytes=data,
         member_count=member_count
