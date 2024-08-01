@@ -25,10 +25,25 @@ bot = lightbulb.BotApp(
 def test_executor(id: int) -> int:
     return id * 2
 
+
 @bot.command
 @lightbulb.command("join", "generate a join banner of you!")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def test(ctx: lightbulb.Context) -> None:
+    await create_banner_command(ctx, images.bannerType.JOIN)
+
+
+@bot.command
+@lightbulb.command("leave", "generate a leave banner of you!")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def leave(ctx: lightbulb.Context) -> None:
+    await create_banner_command(ctx, images.bannerType.LEAVE)
+
+
+@bot.command
+@lightbulb.command("level", "generate a level banner of you!")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def level(ctx: lightbulb.Context) -> None:
     await ctx.respond(hikari.ResponseType.DEFERRED_MESSAGE_CREATE)
     start = datetime.now()
 
@@ -44,16 +59,16 @@ async def test(ctx: lightbulb.Context) -> None:
         username=ctx.author.username,
         user_descriminator=ctx.author.discriminator,
         pfp_bytes=data,
-        member_count=member_count
+        member_count=member_count,
     )
 
     loop = asyncio.get_running_loop()
 
-    result = await loop.run_in_executor(None, functools.partial(images.banner_create, data=banner_data))
+    result = await loop.run_in_executor(
+        None, functools.partial(images.banner_create, data=banner_data)
+    )
 
     current = datetime.now()
-
-    #time_in_sec = (current - new_start).total_seconds()
 
     time_in_sec = (current - start).total_seconds()
 
@@ -62,7 +77,11 @@ async def test(ctx: lightbulb.Context) -> None:
     if result != None:
         await ctx.respond(
             hikari.ResponseType.DEFERRED_MESSAGE_UPDATE,
-            "Here you go! took `" + str(time_in_sec * 1000) + "`ms or `" + str(time_in_sec) + "`s",
+            "Here you go! took `"
+            + str(time_in_sec * 1000)
+            + "`ms or `"
+            + str(time_in_sec)
+            + "`s",
             attachment=hikari.Bytes(result, "welcome.jpeg"),
         )
         return
